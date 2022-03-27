@@ -1,4 +1,4 @@
-  // Lab3P1.s
+ // Lab3P1.s
  //
  // 
  // Author : Eugene Rockey
@@ -49,64 +49,58 @@
 .global Mega328P_Init
 Mega328P_Init:				//Initialize Mega, 
 		
-		//Direction of data for Port B and D
-		ldi	r16,0x07		;PB0(R*W),PB1(RS),PB2(E) as fixed outputs
-		out	DDRB,r16		//0111 sets bits 0:2 of port B as outputs
-		ldi	r16,0			//Load 0 into reg 16
-		out	PORTB,r16		//Value of r16 into PORTB, RESET
-		
-		out	U2X0,r16		;initialize UART, 8bits, no parity, 1 stop, 9600
-		
-		//Set Baud rate
-		ldi	r17,0x0			//Load 0 into r17
-		ldi	r16,0x67		//Load r16 with 0110 0111
-		sts	UBRR0H,r17		//Set Baud Rate 0 High to 0000
-		sts	UBRR0L,r16		//Set Baud Rate 0 High to 0110 0111
+	//Direction of data for Port B and D
+	ldi	r16,0x07		;PB0(R*W),PB1(RS),PB2(E) as fixed outputs
+	out	DDRB,r16		//0111 sets bits 0:2 of port B as outputs
+	ldi	r16,0			//Load 0 into reg 16
+	out	PORTB,r16		//Value of r16 into PORTB, RESET
 	
-		//Enable Reciever/Transmitter, 
-		ldi	r16,24			//Load decimal 24 (0001 1000) into reg 16
-		sts	UCSR0B,r16		//Enables Reciever and Transmitter RXENn/TXENn
-	
-		//Set mode, parity, stop bit and bit rate
-		ldi	r16,6			//Load decimal 6 (0110) into r16
-		sts	UCSR0C,r16		//USART Mode = Asynch, Parity Disabled, 1 stop bit, bit rate=8-bits
-	
-		//Init ADC
-		ldi r16,0x87		//initialize ADC, loads r16 with (1000 0111)
-		sts	ADCSRA,r16		//Enable ADC, Set division factor to 128 between clock freq&input clock
-		
+	out	U2X0,r16		;initialize UART, 8bits, no parity, 1 stop, 9600
+	//Set Baud rate
+	ldi	r17,0x0			//Load 0 into r17
+	ldi	r16,0x67		//Load r16 with 0110 0111
+	sts	UBRR0H,r17		//Set Baud Rate 0 High to 0000
+	sts	UBRR0L,r16		//Set Baud Rate 0 High to 0110 0111
 
-		//*****ASK ABOUT HOW THIS IS WORKING******
+	//Enable Reciever/Transmitter, 
+	ldi	r16,24			//Load decimal 24 (0001 1000) into reg 16
+	sts	UCSR0B,r16		//Enables Reciever and Transmitter RXENn/TXENn
 
-		//Multiplexer Selection Register
-		//REFS = 01, AVcc w/ External Capacitor at AREF ****
-		//ADLAR, ADC Left Adjust Result, result is right adjusted
-		//MUX, Anal Chann Select, 0000, ADC0 (remember that Temp Sensor = 1000?)
-		ldi r16,0x40		//01000000 into r16
-		sts ADMUX,r16		//Ref Selection, AVcc w/External capacitor at AREF pin, ADC0 connected=PC[0]
+	//Set mode, parity, stop bit and bit rate
+	ldi	r16,6			//Load decimal 6 (0110) into r16
+	sts	UCSR0C,r16		//USART Mode = Asynch, Parity Disabled, 1 stop bit, bit rate=8-bits
+
+	//Init ADC
+	ldi r16,0x87		//initialize ADC, loads r16 with (1000 0111)
+	sts	ADCSRA,r16		//Enable ADC, Set division factor to 128 between clock freq&input clock
+	
+	//Multiplexer Selection Register
+	//REFS = 01, AVcc w/ External Capacitor at AREF ****
+	//ADLAR, ADC Left Adjust Result, result is right adjusted
+	//MUX, Anal Chann Select, 0000, ADC0 (remember that Temp Sensor = 1000?)
+	ldi r16,0x40		//01000000 into r16
+	sts ADMUX,r16		//Ref Selection, AVcc w/External capacitor at AREF pin, ADC0 connected=PC[0]
 		
-		//ADC Control and Status Reg B
-		//Analog Comparator Multiplexer Enable (bit 6) set to low, 
-		//AIN1 is applied to neg input of analog comparator (see Analog Comparator Multiplexed Input)
-		//Bits 2:0, ADTS, ADC Auto Trigg Source, 000, Free running mode
-		ldi r16,0			//load 0000 into r16
-		sts ADCSRB,r16		//Free running mode
+	//ADC Control and Status Reg B
+	//Analog Comparator Multiplexer Enable (bit 6) set to low, 
+	//AIN1 is applied to neg input of analog comparator (see Analog Comparator Multiplexed Input)
+	//Bits 2:0, ADTS, ADC Auto Trigg Source, 000, Free running mode
+	ldi r16,0			//load 0000 into r16
+	sts ADCSRB,r16		//Free running mode
 		
-		//Digital Input Disable Registers 1 & 0
+	//Digital Input Disable Registers 1 & 0
+	//DIDR0 Digital Input Disable Register 0
+	//Bits written to 1, digital input buffer is disabled. 
+	//Pin will always read zero if set
+	ldi r16,0xFE		//0100 0000
+	sts DIDR0,r16		//Disable ADC6D
 		
-		//DIDR0 Digital Input Disable Register 0
-		//Bits written to 1, digital input buffer is disabled. 
-		//Pin will always read zero if set
-		;Is this saying we don't need ADC6D
-		ldi r16,0xFE		//0100 0000
-		sts DIDR0,r16		//Disable ADC6D
-		
-		//DIDR1 Digit Input Disable Register 1
-		//AIN1D, AIN0D, AIN Digital Input Disable
-		//When written high, digital input buffer on AIN1/0 disabled
-		ldi r16,0xFF		//1111 1111
-		sts DIDR1,r16		//Disable AIN1/0 pins
-		ret					//student comment here
+	//DIDR1 Digit Input Disable Register 1
+	//AIN1D, AIN0D, AIN Digital Input Disable
+	//When written high, digital input buffer on AIN1/0 disabled
+	ldi r16,0xFF		//1111 1111
+	sts DIDR1,r16		//Disable AIN1/0 pins
+	ret					//student comment here
 	
 .global LCD_Write_Command
 LCD_Write_Command:
@@ -214,47 +208,48 @@ UART_Put:
 
 .global ADC_Get
 ADC_Get:
-		ldi r16,0xC7		//Load r16 with value 1100 0111
-		sts ADCSRA,r16		//ADC Enable, Start Convers, 128 division factor
-A2V1:	lds r16,ADCSRA		//Load r16 with ADC Status Reg A
-		sbrc r16,ADSC		//branch if ADC Start Conv bit clear ****it's always going to be cleared....
-		rjmp A2V1			//Returns to A2V1
-		//Load values of ADC Low into r16
-		lds r16,ADCL		//Load r16 with ADC High bit
-		sts LADC,r16		//Set LADC with r16
-		lds r16,ADCH		//Load r16 with ADC High bit
-		sts HADC,r16		//Set HADC with r16
-		ret					//return to above function
+	ldi r16,0xC7		//Load r16 with value 1100 0111
+	sts ADCSRA,r16		//ADC Enable, Start Convers, 128 division factor
+A2V1:	
+	lds r16,ADCSRA		//Load r16 with ADC Status Reg A
+	sbrc r16,ADSC		//branch if ADC Start Conv bit clear ****it's always going to be cleared....
+	rjmp A2V1			//Returns to A2V1
+	//Load values of ADC Low into r16
+	lds r16,ADCL		//Load r16 with ADC High bit
+	sts LADC,r16		//Set LADC with r16
+	lds r16,ADCH		//Load r16 with ADC High bit
+	sts HADC,r16		//Set HADC with r16
+	ret					//return to above function
 
 .global EEPROM_Write
 EEPROM_Write:      
-		sbic    EECR,EEPE
-		rjmp    EEPROM_Write	; Wait for completion of previous write
-		ldi		r18,0x00		; Set up address (r18:r17) in address register
-		ldi		r17,0x05 
-		ldi		r16,'F'			; Set up data in r16    
-		out     EEARH, r18      
-		out     EEARL, r17			      
-		out     EEDR,r16		; Write data (r16) to Data Register  
-		sbi     EECR,EEMPE		; Write logical one to EEMPE
-		sbi     EECR,EEPE		; Start eeprom write by setting EEPE
-		ret 
+	sbic    EECR,EEPE
+	rjmp    EEPROM_Write	//Wait for completion of previous write
+	ldi		r18,0x00		//Set up address (r18:r17) in address register
+	ldi		r17,0x05 
+	ldi		r16,'F'			//Set up data in r16    
+	out     EEARH, r18      
+	out     EEARL, r17			      
+	out     EEDR,r16		//Write data (r16) to Data Register  
+	sbi     EECR,EEMPE		//Write logical one to EEMPE
+	sbi     EECR,EEPE		//Start eeprom write by setting EEPE
+	ret 
 
 .global EEPROM_Read
 EEPROM_Read:					    
-		sbic    EECR,EEPE    
-		rjmp    EEPROM_Read		; Wait for completion of previous write
-		ldi		r18,0x00		; Set up address (r18:r17) in EEPROM address register
-		ldi		r17,0x05
-		ldi		r16,0x00   
-		out     EEARH, r18   
-		out     EEARL, r17		   
-		sbi     EECR,EERE		; Start eeprom read by writing EERE
-		in      r16,EEDR		; Read data from Data Register
-		sts		ASCII,r16  
-		ret
+	sbic    EECR,EEPE    
+	rjmp    EEPROM_Read		//Wait for completion of previous write
+	ldi		r18,0x00		//Set up address (r18:r17) in EEPROM address register
+	ldi		r17,0x05
+	ldi		r16,0x00   
+	out     EEARH, r18   
+	out     EEARL, r17		   
+	sbi     EECR,EERE		//Start eeprom read by writing EERE
+	in      r16,EEDR		//Read data from Data Register
+	sts		ASCII,r16  
+	ret
 
 
-		.end
+	.end
 
 	
