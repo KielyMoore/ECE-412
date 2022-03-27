@@ -5,38 +5,38 @@
  // Copyright 2022, All Rights Reserved
 
 
-.section ".data"					//student comment here
-.equ	DDRB,0x04					//(0100) PB2 set to output, rest set to inputs
-.equ	DDRD,0x0A					//(1010) PortB bit 1 and 3 set to output, rest to input
-.equ	PORTB,0x05					//(0000 0101) to Port B ****what is address offset? 
-.equ	PORTD,0x0B					//(0000 1011) to Port D 
-.equ	U2X0,1						//Double USART transmission speed
-.equ	UBRR0L,0xC4					//(1100 0100) to Baud Rate 0 Low Reg (4MSB)
-.equ	UBRR0H,0xC5					//(1100 0101) to Baud rate 0 high reg (8LSB)
-.equ	UCSR0A,0xC0					//(1100 0000) USART Control & Status Reg 0 A
-									//RXC0 flag bit set (?), TXC0 flag bit set
-.equ	UCSR0B,0xC1					//USART Control & Status Reg 0 B
-.equ	UCSR0C,0xC2					//USART Control & Status Reg 0 C
-.equ	UDR0,0xC6					//USART I/O Data Reg 0 
-.equ	RXC0,0x07					//
-.equ	UDRE0,0x05					//
-.equ	ADCSRA,0x7A					//ADC Control & Status Reg A
-.equ	ADMUX,0x7C					//ADC Multiplexer Selection Reg
-.equ	ADCSRB,0x7B					//ADC Control & Status Reg B
-.equ	DIDR0,0x7E					//Digital Input Disable Reg 0
-.equ	DIDR1,0x7F					//Digital Input Disable Reg 1
-.equ	ADSC,6						//ADC Start Conversion
-.equ	ADIF,4						//ADC Interrupt Flag
-.equ	ADCL,0x78					//ADC Data Reg Low (ADLAR=0)
-.equ	ADCH,0x79					//ADC Data Reg High (ADLAR=0)
-.equ	EECR,0x1F					//EEPROM Control Reg
-.equ	EEDR,0x20					//EEPROM Data Reg
-.equ	EEARL,0x21					//EEPROM Address Reg Low
-.equ	EEARH,0x22					//EEPROM Address Reg High
-.equ	EERE,0						//EEPROM Read Enable
-.equ	EEPE,1						//EEPROM Write Enable
-.equ	EEMPE,2						//EEPROM Master Write Enable
-.equ	EERIE,3						//EEPROM Ready Interrupt Enable
+.section ".data"			//student comment here
+.equ	DDRB,0x04			//(0100) PB2 set to output, rest set to inputs
+.equ	DDRD,0x0A			//(1010) PortB bit 1 and 3 set to output, rest to input
+.equ	PORTB,0x05			//(0000 0101) to Port B ****what is address offset? 
+.equ	PORTD,0x0B			//(0000 1011) to Port D 
+.equ	U2X0,1				//Double USART transmission speed
+.equ	UBRR0L,0xC4			//(1100 0100) to Baud Rate 0 Low Reg (4MSB)
+.equ	UBRR0H,0xC5			//(1100 0101) to Baud rate 0 high reg (8LSB)
+.equ	UCSR0A,0xC0			//(1100 0000) USART Control & Status Reg 0 A
+							//RXC0 flag bit set (?), TXC0 flag bit set
+.equ	UCSR0B,0xC1			//USART Control & Status Reg 0 B
+.equ	UCSR0C,0xC2			//USART Control & Status Reg 0 C
+.equ	UDR0,0xC6			//USART I/O Data Reg 0 
+.equ	RXC0,0x07			//
+.equ	UDRE0,0x05			//
+.equ	ADCSRA,0x7A			//ADC Control & Status Reg A
+.equ	ADMUX,0x7C			//ADC Multiplexer Selection Reg
+.equ	ADCSRB,0x7B			//ADC Control & Status Reg B
+.equ	DIDR0,0x7E			//Digital Input Disable Reg 0
+.equ	DIDR1,0x7F			//Digital Input Disable Reg 1
+.equ	ADSC,6				//ADC Start Conversion
+.equ	ADIF,4				//ADC Interrupt Flag
+.equ	ADCL,0x78			//ADC Data Reg Low (ADLAR=0)
+.equ	ADCH,0x79			//ADC Data Reg High (ADLAR=0)
+.equ	EECR,0x1F			//EEPROM Control Reg
+.equ	EEDR,0x20			//EEPROM Data Reg
+.equ	EEARL,0x21			//EEPROM Address Reg Low
+.equ	EEARH,0x22			//EEPROM Address Reg High
+.equ	EERE,0				//EEPROM Read Enable
+.equ	EEPE,1				//EEPROM Write Enable
+.equ	EEMPE,2				//EEPROM Master Write Enable
+.equ	EERIE,3				//EEPROM Ready Interrupt Enable
 
 .global HADC				//Declare HADC as global variable
 .global LADC				//Declare LADC as global variable
@@ -174,70 +174,70 @@ LCD_Read_Data:
 
 .global UART_On
 UART_On:
-	ldi		r16,2				//Load 0010 to r16
-	out		DDRD,r16			//Sets direction of pin 1 to output
-	ldi		r16,24				//loads 0001 1000 to r16
-	sts		UCSR0B,r16			//0001 1000 to USCR0B, enable Receiver/Transmitter
-	ret							//Return 
+	ldi		r16,2			//Load 0010 to r16
+	out		DDRD,r16		//Sets direction of pin 1 to output
+	ldi		r16,24			//loads 0001 1000 to r16
+	sts		UCSR0B,r16		//0001 1000 to USCR0B, enable Receiver/Transmitter
+	ret						//Return 
 
 .global UART_Off
 UART_Off:
-	ldi	r16,0					//0000 to r16
-	sts UCSR0B,r16				//Turn off Receiver&Transmitter
-	ret							//student comment here
+	ldi	r16,0				//0000 to r16
+	sts UCSR0B,r16			//Turn off Receiver&Transmitter
+	ret						//student comment here
 
 .global UART_Clear
 UART_Clear:
-	lds		r16,UCSR0A			//Load value of UCSR0A to r16
-	sbrs	r16,RXC0			//Skip if Bit in Reg is Set
-	ret							//return
-	lds		r16,UDR0			//Load UDR0 to r16
-	rjmp	UART_Clear			//student comment here
+	lds		r16,UCSR0A		//Load value of UCSR0A to r16
+	sbrs	r16,RXC0		//Skip if Bit in Reg is Set
+	ret						//return
+	lds		r16,UDR0		//Load UDR0 to r16
+	rjmp	UART_Clear		//student comment here
 
 .global UART_Get
 UART_Get:
-	lds r16,UCSR0A //load r16 with USART Status Reg 0A
-	sbrs r16,RXC0 //skip next line if USART Receive Complete is set
-	rjmp UART_Get //jump to UART_Get
-	lds r16,UDR0 //load r16 with USART Data Reg 0
-	sts ASCII,r16 //Set ASCII with r16
-	ret //return to above function
+	lds r16,UCSR0A 			//load r16 with USART Status Reg 0A
+	sbrs r16,RXC0 			//skip next line if USART Receive Complete is set
+	rjmp UART_Get 			//jump to UART_Get
+	lds r16,UDR0 			//load r16 with USART Data Reg 0
+	sts ASCII,r16 			//Set ASCII with r16
+	ret 					//return to above function
 
 .global UART_Put
 UART_Put:
-	lds r17,UCSR0A //load r17 with USART Status Reg 0A
-	sbrs r17,UDRE0 //skip next line if UDR is ready to receive new data
-	rjmp UART_Put //jump back to top
-	lds r16,ASCII //load r16 with ASCII
-	sts UDR0,r16 //Set USART Data Reg 0 with r16
-	ret //return to above function
+	lds r17,UCSR0A 			//load r17 with USART Status Reg 0A
+	sbrs r17,UDRE0 			//skip next line if UDR is ready to receive new data
+	rjmp UART_Put 			//jump back to top
+	lds r16,ASCII 			//load r16 with ASCII
+	sts UDR0,r16 			//Set USART Data Reg 0 with r16
+	ret 					//return to above function
 
 .global ADC_Get
 ADC_Get:
-		ldi r16,0xC7	//Load r16 with value 1100 0111
-		sts ADCSRA,r16	//ADC Enable, Start Convers, 128 division factor
-A2V1:	lds r16,ADCSRA	//Load r16 with ADC Status Reg A
-		sbrc r16,ADSC	//branch if ADC Start Conv bit clear ****it's always going to be cleared....
-		rjmp A2V1		//Returns to A2V1
+		ldi r16,0xC7		//Load r16 with value 1100 0111
+		sts ADCSRA,r16		//ADC Enable, Start Convers, 128 division factor
+A2V1:	lds r16,ADCSRA		//Load r16 with ADC Status Reg A
+		sbrc r16,ADSC		//branch if ADC Start Conv bit clear ****it's always going to be cleared....
+		rjmp A2V1			//Returns to A2V1
 		//Load values of ADC Low into r16
-		lds r16,ADCL	//Load r16 with ADC High bit
-		sts LADC,r16	//Set LADC with r16
-		lds r16,ADCH	//Load r16 with ADC High bit
-		sts HADC,r16	//Set HADC with r16
-		ret				//return to above function
+		lds r16,ADCL		//Load r16 with ADC High bit
+		sts LADC,r16		//Set LADC with r16
+		lds r16,ADCH		//Load r16 with ADC High bit
+		sts HADC,r16		//Set HADC with r16
+		ret					//return to above function
 
 .global EEPROM_Write
 EEPROM_Write:      
 		sbic    EECR,EEPE
-		rjmp    EEPROM_Write		; Wait for completion of previous write
-		ldi		r18,0x00			; Set up address (r18:r17) in address register
+		rjmp    EEPROM_Write	; Wait for completion of previous write
+		ldi		r18,0x00		; Set up address (r18:r17) in address register
 		ldi		r17,0x05 
-		ldi		r16,'F'				; Set up data in r16    
+		ldi		r16,'F'			; Set up data in r16    
 		out     EEARH, r18      
 		out     EEARL, r17			      
-		out     EEDR,r16			; Write data (r16) to Data Register  
-		sbi     EECR,EEMPE			; Write logical one to EEMPE
-		sbi     EECR,EEPE			; Start eeprom write by setting EEPE
+		out     EEDR,r16		; Write data (r16) to Data Register  
+		sbi     EECR,EEMPE		; Write logical one to EEMPE
+		sbi     EECR,EEPE		; Start eeprom write by setting EEPE
 		ret 
 
 .global EEPROM_Read
