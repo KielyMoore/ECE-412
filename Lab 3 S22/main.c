@@ -44,8 +44,8 @@ unsigned short total;			// variable for getting terminal address
 unsigned char firstByte;		// variable for setting EEPROM memory location
 unsigned char secondByte;		// variable for setting EEPROM memory location
 unsigned char dataByte;			// variable for getting EEPROM memory value
-int intValue;				// variable for getting dataByte
-char volts[5];				// string buffer for ADC output
+int intValue;					// variable for getting dataByte
+char volts[5];					// string buffer for ADC output
 
 
 char volts[5];					//string buffer for ADC output
@@ -142,7 +142,7 @@ void setMemoryAddress(void)
 	ASCII = '\0';
 	while (ASCII == '\0')
 	{
-		UART_Get(); //PC Terminal get value
+		UART_Get(); 						//PC Terminal get value
 	}
 	thousands = ASCII;
 	
@@ -150,7 +150,7 @@ void setMemoryAddress(void)
 	ASCII = '\0';
 	while (ASCII == '\0')
 	{
-		UART_Get(); //PC Terminal get value
+		UART_Get(); 						//PC Terminal get value
 	}
 	hundreds = ASCII;
 	
@@ -158,7 +158,7 @@ void setMemoryAddress(void)
 	ASCII = '\0';
 	while (ASCII == '\0')
 	{
-		UART_Get(); //PC Terminal get value
+		UART_Get(); 						//PC Terminal get value
 	}
 	tens = ASCII;
 	
@@ -166,14 +166,14 @@ void setMemoryAddress(void)
 	ASCII = '\0';
 	while (ASCII == '\0')
 	{
-		UART_Get(); //PC Terminal get value
+		UART_Get(); 						//PC Terminal get value
 	}
 	ones = ASCII;
 	
 	total = (thousands * 1000) + (hundreds * 100) + (tens * 10) + (ones);
 	
-	firstByte = (total & 0xFF);			//Extracts first byte from total
-	secondByte = ((total >> 8) & 0xFF); // Extracts second byte from total
+	firstByte = (total & 0xFF);				//Extracts first byte from total
+	secondByte = ((total >> 8) & 0xFF); 	// Extracts second byte from total
 }
 
 void setMemoryData(void)
@@ -184,7 +184,7 @@ void setMemoryData(void)
 	ASCII = '\0';
 	while (ASCII == '\0')
 	{
-		UART_Get(); //PC Terminal get value
+		UART_Get(); 						//PC Terminal get value
 	}
 	hundreds = ASCII;
 	
@@ -192,7 +192,7 @@ void setMemoryData(void)
 	ASCII = '\0';
 	while (ASCII == '\0')
 	{
-		UART_Get(); //PC Terminal get value
+		UART_Get(); 						//PC Terminal get value
 	}
 	tens = ASCII;
 	
@@ -200,7 +200,7 @@ void setMemoryData(void)
 	ASCII = '\0';
 	while (ASCII == '\0')
 	{
-		UART_Get(); //PC Terminal get value
+		UART_Get(); 						//PC Terminal get value
 	}
 	ones = ASCII;
 	
@@ -212,7 +212,7 @@ void getMemoryData(void)
 	output[0x4] = 0;
 	intValue = (int) dataByte;
 	output[0x0] = intValue;
-	UART_Puts(output); //PC Terminal
+	UART_Puts(output); 						//PC Terminal
 }
 
 void setDataAtMemory(void)
@@ -266,13 +266,13 @@ void EEPROM(void)
 }
 
 
-void Command(void)					//command interpreter
+void Command(void)				//command interpreter
 {
-	UART_Puts(MS3); //PC Terminal
+	UART_Puts(MS3); 			//PC Terminal
 	ASCII = '\0';						
 	while (ASCII == '\0')
 	{
-		UART_Get(); //PC Terminal get value
+		UART_Get(); 			//PC Terminal get value
 	}
 	switch (ASCII)
 	{
