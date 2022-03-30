@@ -8,8 +8,8 @@
  //no includes, no ASF, no libraries
  
  const char MS1[] = "\r\nECE-412 ATMega328PB Tiny OS";
- const char MS2[] = "\r\nby Eugene Rockey Copyright 2022, All Rights Reserved";
- const char MS3[] = "\r\nMenu: (L)CD, (A)DC, (E)EPROM\r\n";
+ const char MS2[] = "\r\nBy ECE412 Team 10: Liam Bellis, Chris Moore, Henry Reynolds, Joshua Riddell, Adam Triebsch";
+ const char MS3[] = "\r\nMenu: (L)CD, (A)DC, (E)EPROM, (C)Reconfigure, (S)et Data Value at Mem, (G)et Data Value at Mem\r\n";
  const char MS4[] = "\r\nReady: ";
  const char MS5[] = "\r\nInvalid Command Try Again...";
  const char MS6[] = "Volts\r";
@@ -34,6 +34,19 @@ unsigned char ASCII;			//shared I/O variable with Assembly
 unsigned char DATA;				//shared internal variable with Assembly
 char HADC;						//shared ADC variable with Assembly
 char LADC;						//shared ADC variable with Assembly
+
+// all values below shared with assembly
+unsigned short thousands;		// variable for getting terminal address
+unsigned short hundreds;		// variable for getting terminal address and data value
+unsigned short tens;			// variable for getting terminal address and data value
+unsigned short ones;			// variable for getting terminal address and data value
+unsigned short total;			// variable for getting terminal address
+unsigned char firstByte;		// variable for setting EEPROM memory location
+unsigned char secondByte;		// variable for setting EEPROM memory location
+unsigned char dataByte;			// variable for getting EEPROM memory value
+int intValue;				// variable for getting dataByte
+char volts[5];				// string buffer for ADC output
+
 
 char volts[5];					//string buffer for ADC output
 int Acc;						//Accumulator for ADC use
@@ -115,32 +128,151 @@ void ADC(void)						//Lite Demo of the Analog to Digital Converter
 	
 }
 
+void Reconfigure(void)
+{
+	UART_Puts("\n\rChange settings to: \n\r\tBaudrate: 4800\n\r\tBit Frame bit\n\r\tParity: Even\n\r\tStop Bit: 2\n\r");
+	ChangeSettings();
+}
+
+void setMemoryAddress(void)
+{
+	UART_Puts("Memory location must fall between 0x0100 and 0x1024 inclusive. Memory location cannot exceed range.");
+	
+	UART_Puts("Please Insert the digit at the thousand's place of the wanted memory address (decimal, not hex):"); //PC Terminal
+	ASCII = '\0';
+	while (ASCII == '\0')
+	{
+		UART_Get(); //PC Terminal get value
+	}
+	thousands = ASCII;
+	
+	UART_Puts("Please Insert the digit at the hundred's place of the wanted memory address (decimal, not hex):"); //PC Terminal
+	ASCII = '\0';
+	while (ASCII == '\0')
+	{
+		UART_Get(); //PC Terminal get value
+	}
+	hundreds = ASCII;
+	
+	UART_Puts("Please Insert the digit at the ten's place of the wanted memory address (decimal, not hex):"); //PC Terminal
+	ASCII = '\0';
+	while (ASCII == '\0')
+	{
+		UART_Get(); //PC Terminal get value
+	}
+	tens = ASCII;
+	
+	UART_Puts("Please Insert the digit at the ones's place of the wanted memory address (decimal, not hex, must be even):"); //PC Terminal
+	ASCII = '\0';
+	while (ASCII == '\0')
+	{
+		UART_Get(); //PC Terminal get value
+	}
+	ones = ASCII;
+	
+	total = (thousands * 1000) + (hundreds * 100) + (tens * 10) + (ones);
+	
+	firstByte = (total & 0xFF);			//Extracts first byte from total
+	secondByte = ((total >> 8) & 0xFF); // Extracts second byte from total
+}
+
+void setMemoryData(void)
+{
+	UART_Puts("Data value installed at memory location must fall within the range of 0 to 255 inclusive.");
+	
+	UART_Puts("Please Insert the digit at the hundred's place of the wanted data value (decimal, not hex):"); //PC Terminal
+	ASCII = '\0';
+	while (ASCII == '\0')
+	{
+		UART_Get(); //PC Terminal get value
+	}
+	hundreds = ASCII;
+	
+	UART_Puts("Please Insert the digit at the ten's place of the wanted data value (decimal, not hex):"); //PC Terminal
+	ASCII = '\0';
+	while (ASCII == '\0')
+	{
+		UART_Get(); //PC Terminal get value
+	}
+	tens = ASCII;
+	
+	UART_Puts("Please Insert the digit at the ones's place of the wanted data value (decimal, not hex):"); //PC Terminal
+	ASCII = '\0';
+	while (ASCII == '\0')
+	{
+		UART_Get(); //PC Terminal get value
+	}
+	ones = ASCII;
+	
+	dataByte = (hundreds * 100) + (tens * 10) + (ones);
+}
+
+void getMemoryData(void)
+{	
+	output[0x4] = 0;
+	intValue = (int) dataByte;
+	output[0x0] = intValue;
+	UART_Puts(output); //PC Terminal
+}
+
+void setDataAtMemory(void)
+{
+	firstByte = 0;
+	secondByte = 0;
+	dataByte = 0;
+	thousands = 0;
+	hundreds = 0;
+	tens = 0;
+	ones = 0;
+	total = 0;
+	
+	setMemoryAddress();
+	setMemoryData();
+	EEPROM_Write();
+}
+
+void getDataAtMemory(void)
+{
+	firstByte = 0;
+	secondByte = 0;
+	dataByte = 0;
+	thousands = 0;
+	hundreds = 0;
+	tens = 0;
+	ones = 0;
+	total = 0;
+	
+	setMemoryAddress();
+	EEPROM_Read();
+	getMemoryData();
+}
+
 void EEPROM(void)
 {
 	UART_Puts("\r\nEEPROM Write and Read.");
 	/*
+	PART 3 OF LAB DEMO
+	
 	Re-engineer this subroutine so that a byte of data can be written to any address in EEPROM
 	during run-time via the command line and the same byte of data can be read back and verified after the power to
 	the Xplained Mini board has been cycled. Ask the user to enter a valid EEPROM address and an
 	8-bit data value. Utilize the following two given Assembly based drivers to communicate with the EEPROM. You
 	may modify the EEPROM drivers as needed. User must be able to always return to command line.
 	*/
-	UART_Puts("\r\n");
-	EEPROM_Write();
-	UART_Puts("\r\n");
-	EEPROM_Read();
-	UART_Put();
-	UART_Puts("\r\n");
+	
+	setDataAtMemory();
+	getDataAtMemory();
+	
 }
 
 
 void Command(void)					//command interpreter
 {
-	UART_Puts(MS3);
+	UART_Puts(MS3); //PC Terminal
 	ASCII = '\0';						
 	while (ASCII == '\0')
 	{
-		UART_Get();
+		UART_Get(); //PC Terminal get value
 	}
 	switch (ASCII)
 	{
@@ -149,6 +281,12 @@ void Command(void)					//command interpreter
 		case 'A' | 'a': ADC();
 		break;
 		case 'E' | 'e': EEPROM();
+		break;
+		case 'C' | 'c': Reconfigure();
+		break;
+		case 'S' | 's': setDataAtMemory();
+		break;
+		case 'G' | 'g': getDataAtMemory();
 		break;
 		default:
 		UART_Puts(MS5);
