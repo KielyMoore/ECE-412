@@ -223,33 +223,44 @@ A2V1:
 
 .global EEPROM_Write
 EEPROM_Write:      
-	sbic    EECR,EEPE
-	rjmp    EEPROM_Write	//Wait for completion of previous write
-	ldi		r18,0x00		//Set up address (r18:r17) in address register
-	ldi		r17,0x05 
-	ldi		r16,'F'			//Set up data in r16    
-	out     EEARH, r18      
-	out     EEARL, r17			      
-	out     EEDR,r16		//Write data (r16) to Data Register  
-	sbi     EECR,EEMPE		//Write logical one to EEMPE
-	sbi     EECR,EEPE		//Start eeprom write by setting EEPE
-	ret 
-
+		sbic    EECR,EEPE
+		rjmp    EEPROM_Write		; Wait for completion of previous write
+		ldi	r18,firstByte		; Set up address (r18:r17) in address register
+		ldi	r17,secondByte 
+		ldi	r16,dataByte		// load desired value into reg 16    
+		out     EEARH, r18      
+		out     EEARL, r17			      
+		out     EEDR,r16		; Write data (r16) to Data Register  
+		sbi     EECR,EEMPE		; Write logical one to EEMPE
+		sbi     EECR,EEPE		; Start eeprom write by setting EEPE
+		ret 
+		
 .global EEPROM_Read
 EEPROM_Read:					    
-	sbic    EECR,EEPE    
-	rjmp    EEPROM_Read		//Wait for completion of previous write
-	ldi		r18,0x00		//Set up address (r18:r17) in EEPROM address register
-	ldi		r17,0x05
-	ldi		r16,0x00   
-	out     EEARH, r18   
-	out     EEARL, r17		   
-	sbi     EECR,EERE		//Start eeprom read by writing EERE
-	in      r16,EEDR		//Read data from Data Register
-	sts		ASCII,r16  
-	ret
+		sbic    EECR,EEPE    
+		rjmp    EEPROM_Read		; Wait for completion of previous write
+		ldi	r18,firstByte		; Set up address (r18:r17) in EEPROM address register
+		ldi	r17,secondByte
+		ldi	r16,0x00		// clear reg 16
+		out     EEARH, r18   
+		out     EEARL, r17		   
+		sbi     EECR,EERE		; Start eeprom read by writing EERE
+		in      r16,EEDR		; Read data from Data Register
+		sts	dataByte,r16		// store value in reg 16 in dataByte
+		ret
 
-
+.global ChangeSettings
+ChangeSettings:
+		ldi	r17, 0x0		// 0000 0000
+		ldi	r16, 0xCF		// 1100 1111
+		sts	UBRR0H, r17		// 4800 baud rate
+		sts	UBRR0L, r16
+		clr	r16
+		clr	r17
+		ldi	r16, 44			// 0010 1100
+		sts	UCSR0C, r16		// asych, even parity, 2 bit stop bit, 
+		ret
+		
 	.end
 
 	
