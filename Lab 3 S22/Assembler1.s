@@ -131,9 +131,9 @@ D1:	dec		r17				//Decrement r17
 .global LCD_Banner
 LCD_Banner:
 	call	LCD_Write_Command	//LCD command to shift display right
-	call	LCD_Delay			//call to LCD Delay
-	call	LCD_Delay			//call to LCD Delay
-	lds	r16,UCSR0A				//
+	call	Delay				//call to LCD Delay
+	call	Delay				//call to LCD Delay
+	lds	    r16,UCSR0A			//
 	sbrs	r16,RXC0			//student comment here
 	rjmp	LCD_Banner			//student comment here
 	ret							//student comment here
