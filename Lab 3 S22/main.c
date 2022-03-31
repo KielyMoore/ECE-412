@@ -6,6 +6,8 @@
  // 
  
  //no includes, no ASF, no libraries
+#include <math.h>
+#include <stdlib.h>
  
  const char MS1[] = "\r\nECE-412 ATMega328PB Tiny OS";
  const char MS2[] = "\r\nby Eugene Rockey Copyright 2022, All Rights Reserved";
