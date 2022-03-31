@@ -6,6 +6,8 @@
  // 
  
  //no includes, no ASF, no libraries
+#include <math.h>
+#include <stdlib.h>
  
  const char MS1[] = "\r\nECE-412 ATMega328PB Tiny OS";
  const char MS2[] = "\r\nby Eugene Rockey Copyright 2022, All Rights Reserved";
@@ -30,14 +32,17 @@ void ADC_Get(void);
 void EEPROM_Read(void);
 void EEPROM_Write(void);
 void ReadTemp(void);
+void Get_Input(void);
 
 unsigned char ASCII;			//shared I/O variable with Assembly
 unsigned char DATA;				//shared internal variable with Assembly
 char HADC;						//shared ADC variable with Assembly
 char LADC;						//shared ADC variable with Assembly
 
-char volts[5];					//string buffer for ADC output
+char Tempf[5];					//string buffer for ADC output
 int Acc;						//Accumulator for ADC use
+int r;
+int tempk, tempc, tempf;
 
 void UART_Puts(const char *str)	//Display a string in the PC Terminal Program
 {
