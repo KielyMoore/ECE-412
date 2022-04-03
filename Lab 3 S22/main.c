@@ -9,7 +9,7 @@
  
  const char MS1[] = "\r\nECE-412 ATMega328PB Tiny OS";
  const char MS2[] = "\r\nBy ECE412 Team 10: Liam Bellis, Chris Moore, Henry Reynolds, Joshua Riddell, Adam Triebsch";
- const char MS3[] = "\r\nMenu: (L)CD, (A)DC, (E)EPROM, (C)Reconfigure, (S)et Data Value at Mem, (G)et Data Value at Mem\r\n";
+ const char MS3[] = "\r\nMenu: (L)CD, (A)DC, (E)EPROM, (C)Reconfigure, (S)et Data, (G)et Data";
  const char MS4[] = "\r\nReady: ";
  const char MS5[] = "\r\nInvalid Command Try Again...";
  const char MS6[] = "Volts\r";
@@ -41,11 +41,11 @@ unsigned short hundreds;		// variable for getting terminal address and data valu
 unsigned short tens;			// variable for getting terminal address and data value
 unsigned short ones;			// variable for getting terminal address and data value
 unsigned short total;			// variable for getting terminal address
-unsigned char firstByte;		// variable for setting EEPROM memory location
-unsigned char secondByte;		// variable for setting EEPROM memory location
-unsigned char dataByte;			// variable for getting EEPROM memory value
+unsigned char FBYTE;			// variable for setting EEPROM memory location
+unsigned char SBYTE;			// variable for setting EEPROM memory location
+unsigned char DBYTE;			// variable for getting EEPROM memory value
 int intValue;					// variable for getting dataByte
-char volts[5];					// string buffer for ADC output
+char volts[5];					//string buffer for ADC output
 
 
 char volts[5];					//string buffer for ADC output
@@ -136,90 +136,81 @@ void Reconfigure(void)
 
 void setMemoryAddress(void)
 {
-	UART_Puts("Memory location must fall between 0x0100 and 0x1024 inclusive. Memory location cannot exceed range.");
+	UART_Puts("\r\n\r\n");
+	UART_Puts("\r\n\r\n");
 	
-	UART_Puts("Please Insert the digit at the thousand's place of the wanted memory address (decimal, not hex):"); //PC Terminal
+	UART_Puts("Memory location must fall between 0x0000 inclusive and 0x100 exclusive. Memory location cannot exceed range.\r\n\r\n");
+	
+	UART_Puts("Please insert the digit at the hundred's place of the wanted memory address (decimal, not hex): \r\n"); //PC Terminal
 	ASCII = '\0';
 	while (ASCII == '\0')
 	{
-		UART_Get(); 						//PC Terminal get value
-	}
-	thousands = ASCII;
-	
-	UART_Puts("Please Insert the digit at the hundred's place of the wanted memory address (decimal, not hex):"); //PC Terminal
-	ASCII = '\0';
-	while (ASCII == '\0')
-	{
-		UART_Get(); 						//PC Terminal get value
+		UART_Get(); //PC Terminal get value
 	}
 	hundreds = ASCII;
 	
-	UART_Puts("Please Insert the digit at the ten's place of the wanted memory address (decimal, not hex):"); //PC Terminal
+	UART_Puts("\r\n\r\n");	
+	
+	UART_Puts("Please Insert the digit at the ten's place of the wanted memory address (decimal, not hex):\r\n"); //PC Terminal
 	ASCII = '\0';
 	while (ASCII == '\0')
 	{
-		UART_Get(); 						//PC Terminal get value
+		UART_Get(); //PC Terminal get value
 	}
 	tens = ASCII;
 	
-	UART_Puts("Please Insert the digit at the ones's place of the wanted memory address (decimal, not hex, must be even):"); //PC Terminal
+	UART_Puts("\r\n\r\n");
+	
+	UART_Puts("Please Insert the digit at the one's place of the wanted memory address (decimal, not hex, must be even):\r\n"); //PC Terminal
 	ASCII = '\0';
 	while (ASCII == '\0')
 	{
-		UART_Get(); 						//PC Terminal get value
+		UART_Get(); //PC Terminal get value
 	}
 	ones = ASCII;
 	
-	total = (thousands * 1000) + (hundreds * 100) + (tens * 10) + (ones);
+	total = (hundreds * 100) + (tens * 10) + (ones);
 	
-	firstByte = (total & 0xFF);				//Extracts first byte from total
-	secondByte = ((total >> 8) & 0xFF); 	// Extracts second byte from total
+	FBYTE = (total & 0xFF);			//Extracts first byte from total
+	SBYTE = ((total >> 8) & 0xFF); // Extracts second byte from total
+	
+	UART_Puts("\r\n\r\n");
+	UART_Puts("\r\n\r\n");
 }
 
 void setMemoryData(void)
 {
-	UART_Puts("Data value installed at memory location must fall within the range of 0 to 255 inclusive.");
-	
-	UART_Puts("Please Insert the digit at the hundred's place of the wanted data value (decimal, not hex):"); //PC Terminal
+	UART_Puts("Please Insert the numerical value to be stored at the given address (0-9):\r\n"); //PC Terminal
 	ASCII = '\0';
 	while (ASCII == '\0')
 	{
-		UART_Get(); 						//PC Terminal get value
-	}
-	hundreds = ASCII;
-	
-	UART_Puts("Please Insert the digit at the ten's place of the wanted data value (decimal, not hex):"); //PC Terminal
-	ASCII = '\0';
-	while (ASCII == '\0')
-	{
-		UART_Get(); 						//PC Terminal get value
-	}
-	tens = ASCII;
-	
-	UART_Puts("Please Insert the digit at the ones's place of the wanted data value (decimal, not hex):"); //PC Terminal
-	ASCII = '\0';
-	while (ASCII == '\0')
-	{
-		UART_Get(); 						//PC Terminal get value
+		UART_Get(); //PC Terminal get value
 	}
 	ones = ASCII;
 	
-	dataByte = (hundreds * 100) + (tens * 10) + (ones);
+	DBYTE = (ones) + 48;
+	
+	UART_Puts("\r\n\r\n");
+	UART_Puts("\r\n\r\n");
 }
 
 void getMemoryData(void)
 {	
+	UART_Puts("The value stored at the memory address given is: \r\n");
 	output[0x4] = 0;
-	intValue = (int) dataByte;
+	intValue = (int) DBYTE - 48;
 	output[0x0] = intValue;
-	UART_Puts(output); 						//PC Terminal
+	UART_Puts(output); //PC Terminal
+	
+	UART_Puts("\r\n\r\n");
+	UART_Puts("\r\n\r\n");
 }
 
 void setDataAtMemory(void)
 {
-	firstByte = 0;
-	secondByte = 0;
-	dataByte = 0;
+	FBYTE = 0;
+	SBYTE = 0;
+	DBYTE = 0;
 	thousands = 0;
 	hundreds = 0;
 	tens = 0;
@@ -233,9 +224,9 @@ void setDataAtMemory(void)
 
 void getDataAtMemory(void)
 {
-	firstByte = 0;
-	secondByte = 0;
-	dataByte = 0;
+	FBYTE = 0;
+	SBYTE = 0;
+	DBYTE = 0;
 	thousands = 0;
 	hundreds = 0;
 	tens = 0;
