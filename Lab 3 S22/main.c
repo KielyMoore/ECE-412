@@ -145,9 +145,9 @@ void setMemoryAddress(void)
 	ASCII = '\0';
 	while (ASCII == '\0')
 	{
-		UART_Get(); //PC Terminal get value
+		UART_Get(); 			//PC Terminal get value
 	}
-	hundreds = ASCII;
+	hundreds = ASCII;			//sets the hundreds value of the memory address to the ASCII variable recieved from the terminal
 	
 	UART_Puts("\r\n\r\n");	
 	
@@ -155,9 +155,9 @@ void setMemoryAddress(void)
 	ASCII = '\0';
 	while (ASCII == '\0')
 	{
-		UART_Get(); //PC Terminal get value
+		UART_Get(); 			//PC Terminal get value
 	}
-	tens = ASCII;
+	tens = ASCII;				//sets the tens value of the memory address to the ASCII variable recieved from the terminal
 	
 	UART_Puts("\r\n\r\n");
 	
@@ -165,14 +165,14 @@ void setMemoryAddress(void)
 	ASCII = '\0';
 	while (ASCII == '\0')
 	{
-		UART_Get(); //PC Terminal get value
+		UART_Get(); 			//PC Terminal get value
 	}
-	ones = ASCII;
+	ones = ASCII;				//sets the ones value of the memory address to the ASCII variable recieved from the terminal
 	
 	total = (hundreds * 100) + (tens * 10) + (ones);
 	
 	FBYTE = (total & 0xFF);			//Extracts first byte from total
-	SBYTE = ((total >> 8) & 0xFF); // Extracts second byte from total
+	SBYTE = ((total >> 8) & 0xFF); 		// Extracts second byte from total
 	
 	UART_Puts("\r\n\r\n");
 	UART_Puts("\r\n\r\n");
@@ -184,11 +184,11 @@ void setMemoryData(void)
 	ASCII = '\0';
 	while (ASCII == '\0')
 	{
-		UART_Get(); //PC Terminal get value
+		UART_Get();					//PC Terminal get value
 	}
-	ones = ASCII;
+	ones = ASCII;					//sets the variable to be written to the memory address equal to the ASCII variable recieved from the terminal
 	
-	DBYTE = (ones) + 48;
+	DBYTE = (ones) + 48;			//converts from decimal to ASCII: all values in DBYTE will be the ASCII equivalent of the same value in ONES
 	
 	UART_Puts("\r\n\r\n");
 	UART_Puts("\r\n\r\n");
@@ -197,10 +197,10 @@ void setMemoryData(void)
 void getMemoryData(void)
 {	
 	UART_Puts("The value stored at the memory address given is: \r\n");
-	output[0x4] = 0;
-	intValue = (int) DBYTE - 48;
-	output[0x0] = intValue;
-	UART_Puts(output); //PC Terminal
+	output[0x4] = 0;			//Provides the end character to the char array (string)
+	intValue = (int) DBYTE - 48;		//Converts from ASCII vaue in DBYTE to real value in intValue
+	output[0x0] = intValue;			//Sets the first four chars of the string to be equal to the four chars of the int
+	UART_Puts(output); //PC Terminal	//Prints the resulting string
 	
 	UART_Puts("\r\n\r\n");
 	UART_Puts("\r\n\r\n");
@@ -208,7 +208,7 @@ void getMemoryData(void)
 
 void setDataAtMemory(void)
 {
-	FBYTE = 0;
+	FBYTE = 0;					//Clears all values relating to reading or writing from memory before modifying
 	SBYTE = 0;
 	DBYTE = 0;
 	thousands = 0;
@@ -217,14 +217,14 @@ void setDataAtMemory(void)
 	ones = 0;
 	total = 0;
 	
-	setMemoryAddress();
-	setMemoryData();
-	EEPROM_Write();
+	setMemoryAddress();			//Sets the memory address registers
+	setMemoryData();			//Sets the data value register
+	EEPROM_Write();				//Writes the data value to the given memory addresses
 }
 
 void getDataAtMemory(void)
 {
-	FBYTE = 0;
+	FBYTE = 0;					//Clears all values relating to reading or writing from memory before modifying
 	SBYTE = 0;
 	DBYTE = 0;
 	thousands = 0;
@@ -233,9 +233,9 @@ void getDataAtMemory(void)
 	ones = 0;
 	total = 0;
 	
-	setMemoryAddress();
-	EEPROM_Read();
-	getMemoryData();
+	setMemoryAddress();			//Sets the Memory Address registers
+	EEPROM_Read();				//Reads value at memory address into given register
+	getMemoryData();			//converts saved memory value back to a readable value and prints
 }
 
 void EEPROM(void)
