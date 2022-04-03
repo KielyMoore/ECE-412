@@ -38,10 +38,14 @@
 .equ	EEMPE,2				//EEPROM Master Write Enable
 .equ	EERIE,3				//EEPROM Ready Interrupt Enable
 
-.global HADC				//Declare HADC as global variable
-.global LADC				//Declare LADC as global variable
-.global ASCII				//Declare ASCII as global variable
-.global DATA				//Declare DATA as global variable
+.global 	HADC			//Declare HADC as global variable
+.global 	LADC			//Declare LADC as global variable
+.global 	ASCII			//Declare ASCII as global variable
+.global 	DATA			//Declare DATA as global variable
+
+.global		FBYTE			// Variable for setting EEPROM memory location
+.global		SBYTE			// Variable for setting EEPROM memory location
+.global		DBYTE			// Variable for getting and setting EEPROM memory value
 
 .set	temp,0				//set temp value to 0
 
@@ -225,28 +229,28 @@ A2V1:
 EEPROM_Write:      
 		sbic    EECR,EEPE
 		rjmp    EEPROM_Write		; Wait for completion of previous write
-		ldi	r18,firstByte		; Set up address (r18:r17) in address register
-		ldi	r17,secondByte 
-		ldi	r16,dataByte		// load desired value into reg 16    
+		lds		r18,FBYTE			; Set up address (r18:r17) in address register
+		lds		r17,SBYTE 
+		lds		r16,DBYTE			// load desired value into reg 16    
 		out     EEARH, r18      
 		out     EEARL, r17			      
-		out     EEDR,r16		; Write data (r16) to Data Register  
-		sbi     EECR,EEMPE		; Write logical one to EEMPE
-		sbi     EECR,EEPE		; Start eeprom write by setting EEPE
+		out     EEDR,r16			; Write data (r16) to Data Register  
+		sbi     EECR,EEMPE			; Write logical one to EEMPE
+		sbi     EECR,EEPE			; Start eeprom write by setting EEPE
 		ret 
-		
+
 .global EEPROM_Read
 EEPROM_Read:					    
 		sbic    EECR,EEPE    
 		rjmp    EEPROM_Read		; Wait for completion of previous write
-		ldi	r18,firstByte		; Set up address (r18:r17) in EEPROM address register
-		ldi	r17,secondByte
-		ldi	r16,0x00		// clear reg 16
+		lds		r18,FBYTE		; Set up address (r18:r17) in EEPROM address register
+		lds		r17,SBYTE
+		ldi		r16,0x00		// clear reg 16
 		out     EEARH, r18   
 		out     EEARL, r17		   
 		sbi     EECR,EERE		; Start eeprom read by writing EERE
 		in      r16,EEDR		; Read data from Data Register
-		sts	dataByte,r16		// store value in reg 16 in dataByte
+		sts		DBYTE,r16		// store value in reg 16 in dataByte
 		ret
 
 .global ChangeSettings
