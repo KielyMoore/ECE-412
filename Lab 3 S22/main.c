@@ -6,6 +6,8 @@
  // 
  
  //no includes, no ASF, no libraries
+#include <math.h>
+#include <stdlib.h>
  
  const char MS1[] = "\r\nECE-412 ATMega328PB Tiny OS";
  const char MS2[] = "\r\nBy ECE412 Team 10: Liam Bellis, Chris Moore, Henry Reynolds, Joshua Riddell, Adam Triebsch";
@@ -29,6 +31,8 @@ void Mega328P_Init(void);
 void ADC_Get(void);
 void EEPROM_Read(void);
 void EEPROM_Write(void);
+void ReadTemp(void);
+void Get_Input(void);
 
 unsigned char ASCII;			//shared I/O variable with Assembly
 unsigned char DATA;				//shared internal variable with Assembly
@@ -45,11 +49,10 @@ unsigned char FBYTE;			// variable for setting EEPROM memory location
 unsigned char SBYTE;			// variable for setting EEPROM memory location
 unsigned char DBYTE;			// variable for getting EEPROM memory value
 int intValue;					// variable for getting dataByte
-char volts[5];					//string buffer for ADC output
-
-
-char volts[5];					//string buffer for ADC output
+char Tempf[5];					//string buffer for ADC output
 int Acc;						//Accumulator for ADC use
+int r;
+int tempk, tempc, tempf;
 
 void UART_Puts(const char *str)	//Display a string in the PC Terminal Program
 {
@@ -100,32 +103,31 @@ void LCD(void)						//Lite LCD demo
 	LCD_Banner();
 }
 
-void ADC(void)						//Lite Demo of the Analog to Digital Converter
-{
-	volts[0x1]='.';
-	volts[0x3]=' ';
-	volts[0x4]= 0;
+void ADC(void){						//Lite Demo of the Analog to Digital Converter
+	UART_Puts("\r\nPrinting temperature in Fahrenheit. Press any key to stop.");
+	Get_Input();
+}
+
+void ReadTemp(void){
 	ADC_Get();
-	Acc = (((int)HADC) * 0x100 + (int)(LADC))*0xA;
-	volts[0x0] = 48 + (Acc / 0x7FE);
-	Acc = Acc % 0x7FE;
-	volts[0x2] = ((Acc *0xA) / 0x7FE) + 48;
-	Acc = (Acc * 0xA) % 0x7FE;
-	if (Acc >= 0x3FF) volts[0x2]++;
-	if (volts[0x2] == 58)
-	{
-		volts[0x2] = 48;
-		volts[0x0]++;
-	}
-	UART_Puts(volts);
-	UART_Puts(MS6);
-	/*
-		Re-engineer this subroutine to display temperature in degrees Fahrenheit on the Terminal.
-		The potentiometer simulates a thermistor, its varying resistance simulates the
-		varying resistance of a thermistor as it is heated and cooled. See the thermistor
-		equations in the lab 3 folder. User must always be able to return to command line.
+	/*The conversion result 1023 corresponds to 5 V. Therefore, we need to divide the conversion result by 204.6 to convert it 
+	back to a voltage. Because the AVR does not support floating point operation directly, we multiply the conversion result by 
+	10 and then divide the product by 2046 to obtain the voltage value.
 	*/
-	
+	//floor(log_2(number))+1 to calculate number of bits needed for that number
+	Acc = ((int)HADC*256.0+(int)LADC);						//combine upper and lower A/D result, Acc is in bits. Times ten to begin conversion
+	r = 10000.0*Acc/(1024.0-Acc);							//thermistor resistance value due to integer voltage value												
+	tempk = 3950.0*298.15/(3950.0+298.15*log(r/10000.0));	//convert to temperature in kelvin
+	tempc = tempk-273.15;									//convert to Celsius
+	tempf = tempc*9.0/5.0+32.0;								//convert to Fahrenheit
+	itoa(tempf,Tempf,10);									//convert float to ASCII
+
+	UART_Puts("\r\n");
+	UART_Puts(Tempf);
+	UART_Puts(" "); 
+	UART_Puts(MS6);
+	UART_Puts("\r\n");
+	UART_Clear();
 }
 
 void Reconfigure(void)

@@ -38,14 +38,15 @@
 .equ	EEMPE,2				//EEPROM Master Write Enable
 .equ	EERIE,3				//EEPROM Ready Interrupt Enable
 
-.global 	HADC			//Declare HADC as global variable
-.global 	LADC			//Declare LADC as global variable
-.global 	ASCII			//Declare ASCII as global variable
-.global 	DATA			//Declare DATA as global variable
 
-.global		FBYTE			// Variable for setting EEPROM memory location
-.global		SBYTE			// Variable for setting EEPROM memory location
-.global		DBYTE			// Variable for getting and setting EEPROM memory value
+.extern ReadTemp
+.global HADC				//Declare HADC as global variable
+.global LADC				//Declare LADC as global variable
+.global ASCII				//Declare ASCII as global variable
+.global DATA				//Declare DATA as global variable
+.global	FBYTE			// Variable for setting EEPROM memory location
+.global	SBYTE			// Variable for setting EEPROM memory location
+.global	DBYTE			// Variable for getting and setting EEPROM memory value
 
 .set	temp,0				//set temp value to 0
 
@@ -122,7 +123,7 @@ LCD_Write_Command:
 	call	UART_On			//Call UART_On
 	ret						//student comment here
 
-LCD_Delay:
+Delay:
 	ldi		r16,0xFA		//load 1111 1010 to r16
 D0:	ldi		r17,0xFF		//load 1111 1111 to r17
 D1:	dec		r17				//Decrement r17 
@@ -134,9 +135,9 @@ D1:	dec		r17				//Decrement r17
 .global LCD_Banner
 LCD_Banner:
 	call	LCD_Write_Command	//LCD command to shift display right
-	call	LCD_Delay			//call to LCD Delay
-	call	LCD_Delay			//call to LCD Delay
-	lds	r16,UCSR0A				//
+	call	Delay				//call to LCD Delay
+	call	Delay				//call to LCD Delay
+	lds	    r16,UCSR0A			//
 	sbrs	r16,RXC0			//student comment here
 	rjmp	LCD_Banner			//student comment here
 	ret							//student comment here
@@ -264,7 +265,35 @@ ChangeSettings:
 		ldi	r16, 44			// 0010 1100
 		sts	UCSR0C, r16		// asych, even parity, 2 bit stop bit, 
 		ret
-		
+
+.global Get_Input
+Get_Input:
+	call	ReadTemp		//call ReadTemp function in main.c
+	call	Delay
+	call	Delay
+	call	Delay
+	call	Delay
+	call	Delay
+	call	Delay
+	call	Delay
+	call	Delay
+	call	Delay
+	call	Delay
+	call	Delay
+	call	Delay
+	call	Delay
+	call	Delay
+	call	Delay
+	call	Delay
+	call	Delay
+	call	Delay
+	lds		r16, UCSR0A			//load r16 with contents of data space location @ UCSR0A
+	sbrs	r16, RXC0			//Checks UCSR0A to see if we've completed a receive, meaning data is ready to be collected from UDR
+	rjmp	Get_Input			//jump back to scrolling if above is not true
+	lds		r16, UDR0			//load r16 with contents of data space location UDR0
+	sts		ASCII, r16			//store contents of r16 to ASCII char
+	ret							//return to C code if recieve is true
+
 	.end
 
 	
